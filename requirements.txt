@@ -2,4 +2,4 @@ openai
 PyPDF2
 dotenv
 streamlit
-streamlit_mermaid
+streamlit-mermaid
