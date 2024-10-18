@@ -10,6 +10,40 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
+# Function to generate HTML content for the Mermaid diagrams
+def save_as_html(diagrams):
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mermaid Diagrams</title>
+        <script type="module">
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            mermaid.initialize({startOnLoad:true});
+        </script>
+    </head>
+    <body>
+    """
+    
+    for idx, diagram in enumerate(diagrams):
+        html_content += f"""
+        <div>
+            <h2>Diagram {idx + 1}</h2>
+            <div class="mermaid">
+                {diagram}
+            </div>
+        </div>
+        <br>
+        """
+    
+    html_content += """
+    </body>
+    </html>
+    """
+    return html_content.encode('utf-8')
+
 def extract_mermaid_diagrams(text):
     # 정규식을 사용하여 mermaid 코드 블록을 추출
     pattern = r'```mermaid\s*(.*?)\s*```'
@@ -250,3 +284,9 @@ if st.button("Generate Graph"):
         else:
             st.subheader(["Introduction", "Method", "Result", "Discussion", "Conclusion", "Other"][diagrams.index(diagram)], divider=True)
         stmd.st_mermaid(diagram, height="600px")
+    
+    # Add button to download HTML file with the Mermaid diagrams
+    html_content = save_as_html(diagrams)
+    
+    st.download_button("Download Diagrams as HTML", html_content, file_name="diagrams.html", mime="text/html")
+    
